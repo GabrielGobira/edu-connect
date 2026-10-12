@@ -8,6 +8,8 @@ from app.models.aluno import Aluno
 from app.schemas.aluno import AlunoCreate, AlunoResponse, AlunoUpdate
 from app.models.nota import Nota
 from app.schemas.nota import NotaCreate, NotaResponse
+from app.models.frequencia import Frequencia
+from app.schemas.frequencia import FrequenciaCreate, FrequenciaResponse
 
 app = FastAPI(
     title="EduConnect",
@@ -179,3 +181,76 @@ def listar_notas(
         consulta = consulta.filter(Nota.aluno_id == aluno_id)
 
     return consulta.order_by(Nota.id.asc()).all()
+
+
+
+@app.post(
+    "/frequencias",
+    response_model=FrequenciaResponse,
+    status_code=status.HTTP_201_CREATED
+)
+def cadastrar_frequencia(
+    dados: FrequenciaCreate,
+    db: Session = Depends(get_db)
+):
+    aluno = db.query(Aluno).filter(
+        Aluno.id == dados.aluno_id
+    ).first()
+
+    if aluno is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Aluno não encontrado."
+        )
+
+    frequencia_existente = db.query(Frequencia).filter(
+        Frequencia.aluno_id == dados.aluno_id,
+        Frequencia.data == dados.data
+    ).first()
+
+    if frequencia_existente:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Já existe um registro de frequência para esse aluno nessa data."
+        )
+
+    frequencia = Frequencia(
+        aluno_id=dados.aluno_id,
+        data=dados.data,
+        presente=dados.presente
+    )
+
+    db.add(frequencia)
+
+    try:
+        db.commit()
+        db.refresh(frequencia)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Não foi possível cadastrar a frequência."
+        )
+
+    return frequencia
+
+
+@app.get(
+    "/frequencias",
+    response_model=list[FrequenciaResponse]
+)
+def listar_frequencias(
+    aluno_id: int | None = None,
+    db: Session = Depends(get_db)
+):
+    consulta = db.query(Frequencia)
+
+    if aluno_id is not None:
+        consulta = consulta.filter(
+            Frequencia.aluno_id == aluno_id
+        )
+
+    return consulta.order_by(
+        Frequencia.data.asc(),
+        Frequencia.id.asc()
+    ).all()
