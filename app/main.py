@@ -222,22 +222,19 @@ def cadastrar_frequencia(
         data=dados.data,
         presente=dados.presente
     )
+    db.add(frequencia)
 
-db.add(frequencia)
+    try:
+        db.commit()
+        db.refresh(frequencia)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Já existe um registro de frequência para esse aluno nessa data."
+        )
 
-try:
-    db.commit()
-    db.refresh(frequencia)
-except IntegrityError:
-    db.rollback()
-    raise HTTPException(
-        status_code=status.HTTP_409_CONFLICT,
-        detail="Já existe um registro de frequência para esse aluno nessa data."
-    )
-
-return frequencia
-
-
+    return frequencia
 @app.get(
     "/frequencias",
     response_model=list[FrequenciaResponse]
