@@ -7,6 +7,8 @@ from sqlalchemy.pool import StaticPool
 from app.database import Base
 from app.models.aluno import Aluno
 from app.models.nota import Nota
+from app.models.frequencia import Frequencia
+from datetime import date
 
 import app.models
 from sqlalchemy import create_engine, inspect
@@ -183,6 +185,44 @@ def test_nota_aluno_inexistente():
         )
 
         session.add(nota)
+
+        with pytest.raises(IntegrityError):
+            session.commit()
+
+        session.rollback()
+
+    engine.dispose()
+
+def test_frequencia_duplicada_no_banco():
+    engine = criar_engine_teste()
+    Base.metadata.create_all(bind=engine)
+
+    with Session(engine) as session:
+        aluno = Aluno(
+            nome="Marcella",
+            matricula="2026999",
+            turma="ADS-01"
+        )
+
+        session.add(aluno)
+        session.commit()
+
+        frequencia1 = Frequencia(
+            aluno_id=aluno.id,
+            data=date(2026, 10, 12),
+            presente=True
+        )
+
+        session.add(frequencia1)
+        session.commit()
+
+        frequencia2 = Frequencia(
+            aluno_id=aluno.id,
+            data=date(2026, 10, 12),
+            presente=False
+        )
+
+        session.add(frequencia2)
 
         with pytest.raises(IntegrityError):
             session.commit()
