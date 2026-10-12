@@ -10,6 +10,9 @@ from app.models.nota import Nota
 from app.schemas.nota import NotaCreate, NotaResponse
 from app.models.frequencia import Frequencia
 from app.schemas.frequencia import FrequenciaCreate, FrequenciaResponse
+from app.models.ocorrencia import Ocorrencia
+from app.schemas.ocorrencia import OcorrenciaCreate, OcorrenciaResponse
+
 
 app = FastAPI(
     title="EduConnect",
@@ -253,4 +256,63 @@ def listar_frequencias(
     return consulta.order_by(
         Frequencia.data.asc(),
         Frequencia.id.asc()
+    ).all()
+
+@app.post(
+    "/ocorrencias",
+    response_model=OcorrenciaResponse,
+    status_code=status.HTTP_201_CREATED
+)
+def cadastrar_ocorrencia(
+    dados: OcorrenciaCreate,
+    db: Session = Depends(get_db)
+):
+    aluno = db.query(Aluno).filter(
+        Aluno.id == dados.aluno_id
+    ).first()
+
+    if aluno is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Aluno não encontrado."
+        )
+
+    ocorrencia = Ocorrencia(
+        aluno_id=dados.aluno_id,
+        descricao=dados.descricao,
+        data=dados.data
+    )
+
+    db.add(ocorrencia)
+
+    try:
+        db.commit()
+        db.refresh(ocorrencia)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Não foi possível cadastrar a ocorrência."
+        )
+
+    return ocorrencia
+
+@app.get(
+    "/ocorrencias",
+    response_model=list[OcorrenciaResponse]
+)
+def listar_ocorrencias(
+    aluno_id: int | None = None,
+    db: Session = Depends(get_db)
+):
+    consulta = db.query(Ocorrencia)
+
+    if aluno_id is not None:
+        consulta = consulta.filter(
+            Ocorrencia.aluno_id == aluno_id
+        )
+
+    return consulta.order_by(
+        Ocorrencia.data.asc(),
+        Ocorrencia.id.asc()
     ).all()
