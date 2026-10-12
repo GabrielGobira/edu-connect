@@ -114,6 +114,20 @@ def test_rejeitar_ocorrencia_com_descricao_vazia():
 
     assert resposta.status_code == 422
 
+def test_rejeitar_ocorrencia_com_descricao_apenas_espacos():
+    aluno = cadastrar_aluno_teste()
+    aluno_id = aluno.json()["id"]
+
+    resposta = client.post(
+        "/ocorrencias",
+        json={
+            "aluno_id": aluno_id,
+            "descricao": "     ",
+            "data": "2026-10-12"
+        }
+    )
+
+    assert resposta.status_code == 422
 
 def test_listar_ocorrencias():
     aluno = cadastrar_aluno_teste()
