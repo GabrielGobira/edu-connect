@@ -9,6 +9,7 @@ from app.models.aluno import Aluno
 from app.models.nota import Nota
 from app.models.frequencia import Frequencia
 from datetime import date
+from app.models.usuario import Usuario
 
 import app.models
 from sqlalchemy import create_engine, inspect
@@ -223,6 +224,66 @@ def test_frequencia_duplicada_no_banco():
         )
 
         session.add(frequencia2)
+
+        with pytest.raises(IntegrityError):
+            session.commit()
+
+        session.rollback()
+
+    engine.dispose()
+
+def test_email_usuario_duplicado():
+    engine = criar_engine_teste()
+
+    Base.metadata.create_all(bind=engine)
+
+    with Session(engine) as session:
+        usuario1 = Usuario(
+            nome="Gabriel",
+            email="gabriel@email.com",
+            senha="hash_teste_1",
+            tipo="professor"
+        )
+
+        usuario2 = Usuario(
+            nome="Joao",
+            email="gabriel@email.com",
+            senha="hash_teste_2",
+            tipo="professor"
+        )
+
+        session.add(usuario1)
+        session.commit()
+
+        session.add(usuario2)
+
+        with pytest.raises(IntegrityError):
+            session.commit()
+
+        session.rollback()
+
+    engine.dispose()
+
+@pytest.mark.parametrize(
+    "campo",
+    ["nome", "email", "senha", "tipo"]
+)
+def test_campos_obrigatorios_usuario(campo):
+    engine = criar_engine_teste()
+    Base.metadata.create_all(bind=engine)
+
+    dados = {
+        "nome": "Gabriel",
+        "email": "gabriel@email.com",
+        "senha": "hash_teste",
+        "tipo": "professor"
+    }
+
+    dados[campo] = None
+
+    with Session(engine) as session:
+        usuario = Usuario(**dados)
+        session.add(usuario)
 
         with pytest.raises(IntegrityError):
             session.commit()
