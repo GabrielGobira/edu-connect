@@ -10,6 +10,7 @@ from app.models.nota import Nota
 from app.models.frequencia import Frequencia
 from datetime import date
 from app.models.usuario import Usuario
+from app.models.ocorrencia import Ocorrencia
 
 import app.models
 from sqlalchemy import create_engine, inspect
@@ -352,5 +353,32 @@ def test_nota_valida_no_banco(valor_nota):
 
         assert nota.id is not None
         assert nota.nota == valor_nota
+
+    engine.dispose()
+    
+@pytest.mark.parametrize(
+    "campo",
+    ["aluno_id", "descricao", "data"]
+)
+def test_campos_obrigatorios_ocorrencia(campo):
+    engine = criar_engine_teste()
+    Base.metadata.create_all(bind=engine)
+
+    dados = {
+        "aluno_id": 1,
+        "descricao": "Aluno chegou atrasado",
+        "data": date(2026, 10, 13)
+    }
+
+    dados[campo] = None
+
+    with Session(engine) as session:
+        ocorrencia = Ocorrencia(**dados)
+        session.add(ocorrencia)
+
+        with pytest.raises(IntegrityError):
+            session.commit()
+
+        session.rollback()
 
     engine.dispose()
