@@ -291,3 +291,66 @@ def test_campos_obrigatorios_usuario(campo):
         session.rollback()
 
     engine.dispose()
+@pytest.mark.parametrize(
+    "valor_nota",
+    [-1.0, 10.1, 15.0]
+)
+def test_nota_fora_intervalo_no_banco(valor_nota):
+    engine = criar_engine_teste()
+    Base.metadata.create_all(bind=engine)
+
+    with Session(engine) as session:
+        aluno = Aluno(
+            nome="Gabriel",
+            matricula="2026001",
+            turma="3A"
+        )
+
+        session.add(aluno)
+        session.commit()
+
+        nota = Nota(
+            aluno_id=aluno.id,
+            disciplina="Matematica",
+            nota=valor_nota
+        )
+
+        session.add(nota)
+
+        with pytest.raises(IntegrityError):
+            session.commit()
+
+        session.rollback()
+
+    engine.dispose()
+@pytest.mark.parametrize(
+    "valor_nota",
+    [0.0, 5.5, 10.0]
+)
+def test_nota_valida_no_banco(valor_nota):
+    engine = criar_engine_teste()
+    Base.metadata.create_all(bind=engine)
+
+    with Session(engine) as session:
+        aluno = Aluno(
+            nome="Gabriel",
+            matricula="2026001",
+            turma="3A"
+        )
+
+        session.add(aluno)
+        session.commit()
+
+        nota = Nota(
+            aluno_id=aluno.id,
+            disciplina="Matematica",
+            nota=valor_nota
+        )
+
+        session.add(nota)
+        session.commit()
+
+        assert nota.id is not None
+        assert nota.nota == valor_nota
+
+    engine.dispose()
