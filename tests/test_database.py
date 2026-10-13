@@ -319,3 +319,30 @@ def test_campos_obrigatorios_ocorrencia(campo):
         session.rollback()
 
     engine.dispose()
+    
+@pytest.mark.parametrize(
+    "campo",
+    ["aluno_id", "data", "presente"]
+)
+def test_campos_obrigatorios_frequencia(campo):
+    engine = criar_engine_teste()
+    Base.metadata.create_all(bind=engine)
+
+    with Session(engine) as session:
+        dados = {
+            "aluno_id": 1,
+            "data": date(2026, 10, 13),
+            "presente": True
+        }
+
+        dados[campo] = None
+
+        frequencia = Frequencia(**dados)
+        session.add(frequencia)
+
+        with pytest.raises(IntegrityError):
+            session.commit()
+
+        session.rollback()
+
+    engine.dispose()
