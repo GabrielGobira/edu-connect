@@ -409,3 +409,98 @@ def test_campos_obrigatorios_frequencia(campo):
         session.rollback()
 
     engine.dispose()
+def test_impedir_exclusao_aluno_com_nota():
+    engine = criar_engine_teste()
+    Base.metadata.create_all(bind=engine)
+
+    with Session(engine) as session:
+        aluno = Aluno(
+            nome="Aluno Teste Exclusao",
+            matricula="EXCLUSAO001",
+            turma="1A"
+        )
+
+        session.add(aluno)
+        session.commit()
+
+        nota = Nota(
+            aluno_id=aluno.id,
+            disciplina="Matematica",
+            nota=8.5
+        )
+
+        session.add(nota)
+        session.commit()
+
+        with pytest.raises(IntegrityError):
+            session.delete(aluno)
+            session.commit()
+
+        session.rollback()
+
+        assert session.get(Aluno, aluno.id) is not None
+
+    engine.dispose()
+def test_impedir_exclusao_aluno_com_frequencia():
+    engine = criar_engine_teste()
+    Base.metadata.create_all(bind=engine)
+
+    with Session(engine) as session:
+        aluno = Aluno(
+            nome="Aluno Teste Frequencia",
+            matricula="EXCLUSAO002",
+            turma="1A"
+        )
+
+        session.add(aluno)
+        session.commit()
+
+        aluno_id = aluno.id
+
+        frequencia = Frequencia(
+            aluno_id=aluno_id,
+            data=date(2026, 10, 15),
+            presente=True
+        )
+
+        session.add(frequencia)
+        session.commit()
+
+        with pytest.raises(IntegrityError):
+            session.delete(aluno)
+            session.commit()
+
+        session.rollback()
+
+        assert session.get(Aluno, aluno_id) is not None
+
+    engine.dispose()
+def test_impedir_exclusao_aluno_com_ocorrencia():
+    engine = criar_engine_teste()
+    Base.metadata.create_all(bind=engine)
+
+    with Session(engine) as session:
+        aluno = Aluno(
+            nome="Aluno Teste",
+            matricula="MAT-OCOR-001",
+            turma="Turma A"
+        )
+        session.add(aluno)
+        session.commit()
+
+        ocorrencia = Ocorrencia(
+            aluno_id=aluno.id,
+            descricao="Ocorrência de teste",
+            data=date(2026, 10, 15)
+        )
+        session.add(ocorrencia)
+        session.commit()
+
+        session.delete(aluno)
+
+        with pytest.raises(IntegrityError):
+            session.commit()
+
+        session.rollback()
+
+    engine.dispose()
