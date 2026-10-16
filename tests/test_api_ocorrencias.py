@@ -1,5 +1,7 @@
 
 import pytest
+from unittest.mock import patch
+from sqlalchemy.exc import IntegrityError
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -214,4 +216,59 @@ def test_atualizar_ocorrencia_inexistente():
     )
 
     assert resposta.status_code == 404
+
+def test_atualizar_ocorrencia_para_aluno_inexistente():
+    aluno = cadastrar_aluno_teste()
+    aluno_id = aluno.json()["id"]
+
+    ocorrencia = client.post(
+        "/ocorrencias",
+        json={
+            "aluno_id": aluno_id,
+            "descricao": "Atraso na primeira aula",
+            "data": "2026-10-12",
+        },
+    )
+
+    ocorrencia_id = ocorrencia.json()["id"]
+
+    resposta = client.put(
+        f"/ocorrencias/{ocorrencia_id}",
+        json={
+            "aluno_id": 99999,
+            "descricao": "Atraso justificado",
+            "data": "2026-10-12",
+        },
+    )
+
+    assert resposta.status_code == 404
+    assert resposta.json()["detail"] == "Aluno não encontrado."
+
+
+def test_tratar_erro_integridade_ao_cadastrar_ocorrencia():
+    aluno = cadastrar_aluno_teste()
+    aluno_id = aluno.json()["id"]
+
+    with patch(
+        "app.main.Session.commit",
+        side_effect=IntegrityError(
+            "INSERT",
+            {},
+            Exception("erro simulado")
+        ),
+    ):
+        resposta = client.post(
+            "/ocorrencias",
+            json={
+                "aluno_id": aluno_id,
+                "descricao": "Atraso na primeira aula",
+                "data": "2026-10-15"
+            }
+        )
+
+    assert resposta.status_code == 400
+    assert resposta.json()["detail"] == (
+        "Não foi possível cadastrar a ocorrência."
+    )
+
 

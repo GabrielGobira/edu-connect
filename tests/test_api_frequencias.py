@@ -1,5 +1,7 @@
 
 import pytest
+from unittest.mock import patch
+from sqlalchemy.exc import IntegrityError
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -208,3 +210,108 @@ def test_atualizar_frequencia_inexistente():
     )
 
     assert resposta.status_code == 404
+
+
+def test_atualizar_frequencia_com_data_duplicada():
+    aluno = cadastrar_aluno_teste()
+    aluno_id = aluno.json()["id"]
+
+    primeira = client.post(
+        "/frequencias",
+        json={
+            "aluno_id": aluno_id,
+            "data": "2026-10-12",
+            "presente": True,
+        },
+    )
+
+    segunda = client.post(
+        "/frequencias",
+        json={
+            "aluno_id": aluno_id,
+            "data": "2026-10-13",
+            "presente": False,
+        },
+    )
+
+    assert primeira.status_code == 201
+    assert segunda.status_code == 201
+
+    segunda_id = segunda.json()["id"]
+
+    resposta = client.put(
+        f"/frequencias/{segunda_id}",
+        json={
+            "aluno_id": aluno_id,
+            "data": "2026-10-12",
+            "presente": False,
+        },
+    )
+
+    assert resposta.status_code == 409
+
+
+def test_tratar_erro_integridade_ao_cadastrar_frequencia():
+    aluno = cadastrar_aluno_teste()
+    aluno_id = aluno.json()["id"]
+
+    with patch(
+        "app.main.Session.commit",
+        side_effect=IntegrityError(
+            "INSERT",
+            {},
+            Exception("erro simulado")
+        ),
+    ):
+        resposta = client.post(
+            "/frequencias",
+            json={
+                "aluno_id": aluno_id,
+                "data": "2026-10-15",
+                "presente": True
+            }
+        )
+
+    assert resposta.status_code == 409
+    assert resposta.json()["detail"] == (
+        "Já existe um registro de frequência para esse aluno nessa data."
+    )
+
+
+def test_tratar_erro_integridade_ao_atualizar_frequencia():
+    aluno = cadastrar_aluno_teste()
+    aluno_id = aluno.json()["id"]
+
+    cadastro = client.post(
+        "/frequencias",
+        json={
+            "aluno_id": aluno_id,
+            "data": "2026-10-14",
+            "presente": True
+        }
+    )
+
+    frequencia_id = cadastro.json()["id"]
+
+    with patch(
+        "app.main.Session.commit",
+        side_effect=IntegrityError(
+            "UPDATE",
+            {},
+            Exception("erro simulado")
+        ),
+    ):
+        resposta = client.put(
+            f"/frequencias/{frequencia_id}",
+            json={
+                "aluno_id": aluno_id,
+                "data": "2026-10-15",
+                "presente": False
+            }
+        )
+
+    assert resposta.status_code == 409
+    assert resposta.json()["detail"] == (
+        "Não foi possível atualizar a frequência."
+    )
+

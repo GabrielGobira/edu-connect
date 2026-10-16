@@ -504,3 +504,59 @@ def test_impedir_exclusao_aluno_com_ocorrencia():
         session.rollback()
 
     engine.dispose()
+
+
+from unittest.mock import MagicMock
+
+from app.database import get_db
+
+
+def test_get_db_fecha_sessao_ao_finalizar():
+    sessao_falsa = MagicMock()
+
+    def criar_sessao():
+        return sessao_falsa
+
+    from app import database
+
+    sessao_original = database.SessionLocal
+    database.SessionLocal = criar_sessao
+
+    try:
+        gerador = get_db()
+        sessao_recebida = next(gerador)
+
+        assert sessao_recebida is sessao_falsa
+
+        gerador.close()
+
+        sessao_falsa.close.assert_called_once()
+    finally:
+        database.SessionLocal = sessao_original
+
+def test_criar_banco_cria_tabelas_e_exibe_mensagem(
+    monkeypatch,
+    capsys,
+):
+    from app import init_db
+
+    chamadas = []
+
+    def criar_tabelas_falso(bind):
+        chamadas.append(bind)
+
+    monkeypatch.setattr(
+        init_db.Base.metadata,
+        "create_all",
+        criar_tabelas_falso,
+    )
+
+    init_db.criar_banco()
+
+    saida = capsys.readouterr()
+
+    assert chamadas == [init_db.engine]
+    assert (
+        saida.out.strip()
+        == "Banco de dados e tabelas criados com sucesso!"
+    )
