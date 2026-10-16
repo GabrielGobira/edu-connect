@@ -170,3 +170,48 @@ def test_filtrar_ocorrencias_por_aluno():
     assert resposta.status_code == 200
     assert len(resposta.json()) == 1
     assert resposta.json()[0]["aluno_id"] == aluno_id
+
+
+def test_atualizar_ocorrencia():
+    aluno = cadastrar_aluno_teste()
+    aluno_id = aluno.json()["id"]
+
+    ocorrencia = client.post(
+        "/ocorrencias",
+        json={
+            "aluno_id": aluno_id,
+            "descricao": "Atraso na primeira aula",
+            "data": "2026-10-12"
+        }
+    )
+
+    ocorrencia_id = ocorrencia.json()["id"]
+
+    resposta = client.put(
+        f"/ocorrencias/{ocorrencia_id}",
+        json={
+            "aluno_id": aluno_id,
+            "descricao": "Atraso justificado",
+            "data": "2026-10-12"
+        }
+    )
+
+    assert resposta.status_code == 200
+    assert resposta.json()["descricao"] == "Atraso justificado"
+
+
+def test_atualizar_ocorrencia_inexistente():
+    aluno = cadastrar_aluno_teste()
+    aluno_id = aluno.json()["id"]
+
+    resposta = client.put(
+        "/ocorrencias/99999",
+        json={
+            "aluno_id": aluno_id,
+            "descricao": "Atraso justificado",
+            "data": "2026-10-12"
+        }
+    )
+
+    assert resposta.status_code == 404
+

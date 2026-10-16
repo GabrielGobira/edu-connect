@@ -1,5 +1,4 @@
-
-from datetime import date
+﻿from datetime import date
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -18,3 +17,8 @@ class FrequenciaResponse(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+
+class FrequenciaUpdate(BaseModel):
+    aluno_id: int = Field(gt=0)
+    data: date
+    presente: bool

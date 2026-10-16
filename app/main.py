@@ -9,9 +9,17 @@ from app.schemas.aluno import AlunoCreate, AlunoResponse, AlunoUpdate
 from app.models.nota import Nota
 from app.schemas.nota import NotaCreate, NotaResponse
 from app.models.frequencia import Frequencia
-from app.schemas.frequencia import FrequenciaCreate, FrequenciaResponse
+from app.schemas.frequencia import (
+    FrequenciaCreate,
+    FrequenciaResponse,
+    FrequenciaUpdate,
+)
 from app.models.ocorrencia import Ocorrencia
-from app.schemas.ocorrencia import OcorrenciaCreate, OcorrenciaResponse
+from app.schemas.ocorrencia import (
+    OcorrenciaCreate,
+    OcorrenciaResponse,
+    OcorrenciaUpdate,
+)
 
 
 app = FastAPI(
@@ -254,6 +262,62 @@ def listar_frequencias(
         Frequencia.data.asc(),
         Frequencia.id.asc()
     ).all()
+@app.put(
+    "/frequencias/{frequencia_id}",
+    response_model=FrequenciaResponse,
+)
+def atualizar_frequencia(
+    frequencia_id: int,
+    dados: FrequenciaUpdate,
+    db: Session = Depends(get_db),
+):
+    frequencia = db.query(Frequencia).filter(
+        Frequencia.id == frequencia_id
+    ).first()
+
+    if frequencia is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Frequência não encontrada.",
+        )
+
+    aluno = db.query(Aluno).filter(
+        Aluno.id == dados.aluno_id
+    ).first()
+
+    if aluno is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Aluno não encontrado.",
+        )
+
+    duplicada = db.query(Frequencia).filter(
+        Frequencia.aluno_id == dados.aluno_id,
+        Frequencia.data == dados.data,
+        Frequencia.id != frequencia_id,
+    ).first()
+
+    if duplicada:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Já existe um registro de frequência para esse aluno nessa data.",
+        )
+
+    frequencia.aluno_id = dados.aluno_id
+    frequencia.data = dados.data
+    frequencia.presente = dados.presente
+
+    try:
+        db.commit()
+        db.refresh(frequencia)
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Não foi possível atualizar a frequência.",
+        )
+
+    return frequencia
 
 @app.post(
     "/ocorrencias",
@@ -313,3 +377,42 @@ def listar_ocorrencias(
         Ocorrencia.data.asc(),
         Ocorrencia.id.asc()
     ).all()
+
+
+@app.put(
+    "/ocorrencias/{ocorrencia_id}",
+    response_model=OcorrenciaResponse,
+)
+def atualizar_ocorrencia(
+    ocorrencia_id: int,
+    dados: OcorrenciaUpdate,
+    db: Session = Depends(get_db),
+):
+    ocorrencia = db.query(Ocorrencia).filter(
+        Ocorrencia.id == ocorrencia_id
+    ).first()
+
+    if ocorrencia is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Ocorrência não encontrada.",
+        )
+
+    aluno = db.query(Aluno).filter(
+        Aluno.id == dados.aluno_id
+    ).first()
+
+    if aluno is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Aluno não encontrado.",
+        )
+
+    ocorrencia.aluno_id = dados.aluno_id
+    ocorrencia.descricao = dados.descricao
+    ocorrencia.data = dados.data
+
+    db.commit()
+    db.refresh(ocorrencia)
+
+    return ocorrencia

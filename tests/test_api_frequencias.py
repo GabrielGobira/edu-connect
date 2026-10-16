@@ -165,3 +165,46 @@ def test_filtrar_frequencias_por_aluno():
     assert len(resposta.json()) == 1
     assert resposta.json()[0]["aluno_id"] == aluno_id
     assert resposta.json()[0]["presente"] is False
+
+def test_atualizar_frequencia():
+    aluno = cadastrar_aluno_teste()
+    aluno_id = aluno.json()["id"]
+
+    frequencia = client.post(
+        "/frequencias",
+        json={
+            "aluno_id": aluno_id,
+            "data": "2026-10-12",
+            "presente": True
+        }
+    )
+
+    frequencia_id = frequencia.json()["id"]
+
+    resposta = client.put(
+        f"/frequencias/{frequencia_id}",
+        json={
+            "aluno_id": aluno_id,
+            "data": "2026-10-12",
+            "presente": False
+        }
+    )
+
+    assert resposta.status_code == 200
+    assert resposta.json()["presente"] is False
+
+
+def test_atualizar_frequencia_inexistente():
+    aluno = cadastrar_aluno_teste()
+    aluno_id = aluno.json()["id"]
+
+    resposta = client.put(
+        "/frequencias/99999",
+        json={
+            "aluno_id": aluno_id,
+            "data": "2026-10-12",
+            "presente": False
+        }
+    )
+
+    assert resposta.status_code == 404
