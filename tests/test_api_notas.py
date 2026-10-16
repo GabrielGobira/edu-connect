@@ -1,5 +1,7 @@
 
 import pytest
+from unittest.mock import patch
+from sqlalchemy.exc import IntegrityError
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -162,4 +164,28 @@ def test_filtrar_notas_por_aluno():
     assert resposta.status_code == 200
     assert len(resposta.json()) == 1
     assert resposta.json()[0]["aluno_id"] == aluno_id
+
+def test_tratar_erro_integridade_ao_cadastrar_nota():
+    aluno = cadastrar_aluno_teste()
+    aluno_id = aluno.json()["id"]
+
+    with patch(
+        "app.main.Session.commit",
+        side_effect=IntegrityError(
+            "INSERT",
+            {},
+            Exception("erro simulado")
+        ),
+    ):
+        resposta = client.post(
+            "/notas",
+            json={
+                "aluno_id": aluno_id,
+                "disciplina": "Matemática",
+                "nota": 8.5
+            }
+        )
+
+    assert resposta.status_code == 400
+    assert resposta.json()["detail"] == "Não foi possível cadastrar a nota."
 

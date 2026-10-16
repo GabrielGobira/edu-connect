@@ -218,3 +218,64 @@ def test_atualizar_com_matricula_duplicada():
     assert resposta.json()["detail"] == (
         "Já existe outro aluno com essa matrícula."
     )
+
+
+from unittest.mock import patch
+from sqlalchemy.exc import IntegrityError
+
+
+def test_tratar_erro_integridade_ao_cadastrar_aluno():
+    with patch(
+        "app.main.Session.commit",
+        side_effect=IntegrityError(
+            "INSERT",
+            {},
+            Exception("erro simulado"),
+        ),
+    ):
+        resposta = client.post(
+            "/alunos",
+            json={
+                "nome": "Carlos Silva",
+                "matricula": "2026010",
+                "turma": "ADS-01",
+            },
+        )
+
+    assert resposta.status_code == 409
+
+
+def test_tratar_erro_integridade_ao_atualizar_aluno():
+    cadastro = client.post(
+        "/alunos",
+        json={
+            "nome": "Carlos Silva",
+            "matricula": "2026011",
+            "turma": "ADS-01",
+        },
+    )
+
+    aluno_id = cadastro.json()["id"]
+
+    with patch(
+        "app.main.Session.commit",
+        side_effect=IntegrityError(
+            "UPDATE",
+            {},
+            Exception("erro simulado"),
+        ),
+    ):
+        resposta = client.put(
+            f"/alunos/{aluno_id}",
+            json={
+                "nome": "Carlos Souza",
+                "matricula": "2026011",
+                "turma": "ADS-02",
+            },
+        )
+
+    assert resposta.status_code == 409
+    assert resposta.json()["detail"] == (
+        "Não foi possível atualizar o aluno."
+    )
+
