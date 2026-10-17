@@ -1,4 +1,4 @@
-﻿# EduConnect
+# EduConnect
 
 API de gerenciamento escolar desenvolvida com Python, FastAPI, SQLAlchemy e SQLite.
 
