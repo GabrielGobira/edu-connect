@@ -12,13 +12,9 @@ from datetime import date
 from app.models.usuario import Usuario
 from app.models.ocorrencia import Ocorrencia
 
-import app.models
-from sqlalchemy import create_engine, inspect
-from sqlalchemy.pool import StaticPool
+from sqlalchemy import inspect
 from sqlalchemy.exc import IntegrityError
 
-from app.database import Base
-import app.models
 
 from sqlalchemy import event
 def criar_engine_teste():
@@ -58,8 +54,6 @@ def test_criacao_tabelas():
     engine.dispose()
 
 
-from sqlalchemy.orm import Session
-from app.models.aluno import Aluno
 
 
 def test_cadastrar_aluno():
@@ -91,7 +85,6 @@ def test_cadastrar_aluno():
 
     engine.dispose()
 
-from sqlalchemy.exc import IntegrityError
 
 
 def test_matricula_duplicada():
@@ -173,7 +166,7 @@ def test_cadastrar_nota_aluno(nome, matricula, disciplina, valor):
         assert nota_salva.aluno_id == aluno.id
 
     engine.dispose()
-    
+
 def test_nota_aluno_inexistente():
     engine = criar_engine_teste()
 
@@ -355,7 +348,7 @@ def test_nota_valida_no_banco(valor_nota):
         assert nota.nota == valor_nota
 
     engine.dispose()
-    
+
 @pytest.mark.parametrize(
     "campo",
     ["aluno_id", "descricao", "data"]
@@ -382,7 +375,7 @@ def test_campos_obrigatorios_ocorrencia(campo):
         session.rollback()
 
     engine.dispose()
-    
+
 @pytest.mark.parametrize(
     "campo",
     ["aluno_id", "data", "presente"]

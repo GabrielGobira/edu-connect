@@ -141,7 +141,7 @@ def test_buscar_aluno_inexistente():
     assert resposta.status_code == 404
     assert resposta.json()["detail"] == "Aluno não encontrado."
 
-    
+
 def test_atualizar_aluno():
     cadastro = client.post(
         "/alunos",
