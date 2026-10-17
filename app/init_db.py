@@ -1,5 +1,4 @@
 from app.database import Base, engine
-import app.models
 
 
 def criar_banco():
