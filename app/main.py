@@ -1,5 +1,8 @@
-
 from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
+from app.models.usuario import Usuario
+from app.security import verificar_senha, criar_token
+from app.auth import exigir_administrador
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 
@@ -34,6 +37,32 @@ def home():
     return {
         "mensagem": "Bem-vindo ao EduConnect"
     }
+
+@app.post("/login", tags=["Autenticação"])
+def login(
+    dados: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
+):
+    usuario = db.query(Usuario).filter(
+        Usuario.email == dados.username
+    ).first()
+
+    if usuario is None or not verificar_senha(
+        dados.password, usuario.senha
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="E-mail ou senha inválidos.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    token = criar_token(usuario.id)
+
+    return {
+        "access_token": token,
+        "token_type": "bearer",
+    }
+
 
 
 @app.post(
@@ -416,3 +445,54 @@ def atualizar_ocorrencia(
     db.refresh(ocorrencia)
 
     return ocorrencia
+
+@app.delete(
+    "/alunos/{aluno_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=["Alunos"],
+)
+def excluir_aluno(
+    aluno_id: int,
+    db: Session = Depends(get_db),
+    administrador: Usuario = Depends(exigir_administrador),
+):
+    aluno = db.query(Aluno).filter(
+        Aluno.id == aluno_id
+    ).first()
+
+    if aluno is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Aluno não encontrado.",
+        )
+
+    possui_nota = db.query(Nota).filter(
+        Nota.aluno_id == aluno_id
+    ).first() is not None
+
+    possui_frequencia = db.query(Frequencia).filter(
+        Frequencia.aluno_id == aluno_id
+    ).first() is not None
+
+    possui_ocorrencia = db.query(Ocorrencia).filter(
+        Ocorrencia.aluno_id == aluno_id
+    ).first() is not None
+
+    if possui_nota or possui_frequencia or possui_ocorrencia:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                "Não é possível excluir o aluno porque "
+                "existem notas, frequências ou ocorrências vinculadas."
+            ),
+        )
+
+    try:
+        db.delete(aluno)
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Não foi possível excluir o aluno devido a registros vinculados.",
+        )
