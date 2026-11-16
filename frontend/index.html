@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>EduConnect | Sistema Escolar</title>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    <div class="app-container">
+
+        <!-- MENU LATERAL -->
+        <aside class="sidebar">
+
+            <div class="brand">
+                <div class="brand-icon">≡</div>
+                <h2>EduConnect</h2>
+            </div>
+
+            <span class="menu-title">ÍNDICE</span>
+
+            <nav class="menu">
+
+                <button class="menu-item active" data-page="alunos">
+                    <span>01</span>
+                    Alunos
+                </button>
+
+                <button class="menu-item" data-page="frequencia">
+                    <span>02</span>
+                    Frequência
+                </button>
+
+                <button class="menu-item" data-page="notas">
+                    <span>03</span>
+                    Notas
+                </button>
+
+                <button class="menu-item" data-page="ocorrencias">
+                    <span>04</span>
+                    Ocorrências
+                </button>
+
+            </nav>
+
+            <div class="sidebar-footer">
+                <strong>EduConnect</strong>
+                <small>Sistema Escolar</small>
+            </div>
+
+        </aside>
+
+        <!-- CONTEÚDO PRINCIPAL -->
+        <main class="main-content">
+
+            <header class="topbar">
+                <div>
+                    <span class="school-label">EDUCONNECT • SISTEMA ESCOLAR</span>
+                    <h1 id="page-title">Cadastrar aluno</h1>
+                </div>
+            </header>
+
+            <section id="page-content">
+
+                <div class="welcome-message">
+                    <h2>Bem-vindo ao EduConnect!</h2>
+                    <p>Selecione uma opção no menu para começar.</p>
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>
