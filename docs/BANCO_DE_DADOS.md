@@ -89,7 +89,7 @@ python -m pytest tests/test_database.py -v
 
 Os testes incluem verificações de campos obrigatórios, unicidade, integridade referencial e regras de negócio.
 
-Na última execução validada, a suíte completa apresentou 55 testes aprovados.
+Na última execução validada, em 17/11/2026, a suíte completa apresentou 83 testes automatizados aprovados, nenhuma falha e um aviso de compatibilidade relacionado ao Starlette/httpx.
 
 ## 7. Arquivos principais
 
