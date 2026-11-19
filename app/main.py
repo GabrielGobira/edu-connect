@@ -5,6 +5,7 @@ from app.security import verificar_senha, criar_token
 from app.auth import exigir_administrador
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import get_db
 from app.models.aluno import Aluno
@@ -30,7 +31,16 @@ app = FastAPI(
     description="API para gerenciamento escolar",
     version="1.0.0"
 )
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://127.0.0.1:5500",
+        "http://localhost:5500"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def home():

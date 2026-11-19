@@ -13,9 +13,46 @@
 
 <body>
 
-    <div class="app-container">
+    <!-- TELA DE LOGIN -->
+    <section id="login-screen" class="login-screen">
+        <div class="login-card">
+            <div class="brand">
+                <div class="brand-icon">≡</div>
+                <h2>EduConnect</h2>
+            </div>
 
-        <!-- MENU LATERAL -->
+            <h1>Acesse sua conta</h1>
+            <p>Entre com suas credenciais para continuar.</p>
+
+            <form id="form-login">
+                <label for="email">E-mail</label>
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="seu@email.com"
+                    required
+                >
+
+                <label for="senha">Senha</label>
+                <input
+                    type="password"
+                    id="senha"
+                    name="senha"
+                    placeholder="Digite sua senha"
+                    required
+                >
+
+                <button type="submit">Entrar no sistema</button>
+
+                <p id="mensagem-login" role="alert"></p>
+            </form>
+        </div>
+    </section>
+
+    <!-- SISTEMA PRINCIPAL -->
+    <div class="app-container" id="app-container" hidden>
+
         <aside class="sidebar">
 
             <div class="brand">
@@ -52,11 +89,11 @@
             <div class="sidebar-footer">
                 <strong>EduConnect</strong>
                 <small>Sistema Escolar</small>
+                <button id="btn-logout" type="button">Sair do sistema</button>
             </div>
 
         </aside>
 
-        <!-- CONTEÚDO PRINCIPAL -->
         <main class="main-content">
 
             <header class="topbar">
