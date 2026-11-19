@@ -5,6 +5,7 @@ from app.security import verificar_senha, criar_token
 from app.auth import exigir_administrador
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import get_db
 from app.models.aluno import Aluno
@@ -30,7 +31,16 @@ app = FastAPI(
     description="API para gerenciamento escolar",
     version="1.0.0"
 )
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://127.0.0.1:5500",
+        "http://localhost:5500"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def home():
@@ -209,7 +219,6 @@ def cadastrar_nota(
 
     return nota
 
-
 @app.get("/notas", response_model=list[NotaResponse])
 def listar_notas(
     aluno_id: int | None = None,
@@ -222,7 +231,28 @@ def listar_notas(
 
     return consulta.order_by(Nota.id.asc()).all()
 
+@app.delete(
+    "/notas/{nota_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=["Notas"],
+)
+def excluir_nota(
+    nota_id: int,
+    db: Session = Depends(get_db),
+    administrador: Usuario = Depends(exigir_administrador),
+):
+    nota = db.query(Nota).filter(
+        Nota.id == nota_id
+    ).first()
 
+    if nota is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Nota não encontrada.",
+        )
+
+    db.delete(nota)
+    db.commit()
 
 @app.post(
     "/frequencias",
@@ -348,6 +378,30 @@ def atualizar_frequencia(
 
     return frequencia
 
+
+@app.delete(
+    "/frequencias/{frequencia_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=["Frequências"],
+)
+def excluir_frequencia(
+    frequencia_id: int,
+    db: Session = Depends(get_db),
+    administrador: Usuario = Depends(exigir_administrador),
+):
+    frequencia = db.query(Frequencia).filter(
+        Frequencia.id == frequencia_id
+    ).first()
+
+    if frequencia is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Frequência não encontrada.",
+        )
+
+    db.delete(frequencia)
+    db.commit()
+
 @app.post(
     "/ocorrencias",
     response_model=OcorrenciaResponse,
@@ -407,6 +461,28 @@ def listar_ocorrencias(
         Ocorrencia.id.asc()
     ).all()
 
+@app.delete(
+    "/ocorrencias/{ocorrencia_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=["Ocorrências"],
+)
+def excluir_ocorrencia(
+    ocorrencia_id: int,
+    db: Session = Depends(get_db),
+    administrador: Usuario = Depends(exigir_administrador),
+):
+    ocorrencia = db.query(Ocorrencia).filter(
+        Ocorrencia.id == ocorrencia_id
+    ).first()
+
+    if ocorrencia is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Ocorrência não encontrada.",
+        )
+
+    db.delete(ocorrencia)
+    db.commit()
 
 @app.put(
     "/ocorrencias/{ocorrencia_id}",
@@ -445,7 +521,6 @@ def atualizar_ocorrencia(
     db.refresh(ocorrencia)
 
     return ocorrencia
-
 @app.delete(
     "/alunos/{aluno_id}",
     status_code=status.HTTP_204_NO_CONTENT,
@@ -486,7 +561,6 @@ def excluir_aluno(
                 "existem notas, frequências ou ocorrências vinculadas."
             ),
         )
-
     try:
         db.delete(aluno)
         db.commit()

@@ -1,0 +1,578 @@
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Schibsted+Grotesk:wght@400;500;600;700;800&display=swap');
+
+/* IDENTIDADE VISUAL */
+
+:root {
+    --navy: #11263C;
+    --yellow: #F8B82E;
+    --paper: #F3F2EC;
+    --white: #FFFFFF;
+    --red: #C23822;
+    --green: #1E7F5A;
+    --text: #182C40;
+    --border: #D5D7D5;
+    --muted: #718096;
+}
+
+/* CONFIGURAÇÕES GERAIS */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Schibsted Grotesk', sans-serif;
+    background: var(--paper);
+    color: var(--text);
+}
+
+button {
+    font-family: inherit;
+    cursor: pointer;
+}
+
+/* ESTRUTURA PRINCIPAL */
+
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* MENU LATERAL */
+
+.sidebar {
+    width: 205px;
+    min-height: 100vh;
+    background: var(--navy);
+    color: var(--white);
+    padding: 25px 15px;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 48px;
+    padding: 0 5px;
+}
+
+.brand-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: var(--yellow);
+    color: var(--navy);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 27px;
+    font-weight: 800;
+}
+
+.brand h2 {
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.menu-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: #B8C5D1;
+    letter-spacing: 1px;
+    margin: 0 5px 15px;
+}
+
+.menu {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    border: none;
+    border-radius: 9px;
+    padding: 12px 10px;
+    background: transparent;
+    color: var(--white);
+    text-align: left;
+    font-size: 13px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.menu-item span {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: #A9B9C9;
+}
+
+.menu-item:hover {
+    background: #263E55;
+}
+
+.menu-item.active {
+    background: var(--paper);
+    color: var(--navy);
+}
+
+.menu-item.active span {
+    color: var(--muted);
+}
+
+.sidebar-footer {
+    margin-top: auto;
+    padding: 15px 5px 0;
+    border-top: 1px solid #34495C;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sidebar-footer strong {
+    font-size: 12px;
+}
+
+.sidebar-footer small {
+    font-size: 10px;
+    color: #B8C5D1;
+}
+
+/* CONTEÚDO PRINCIPAL */
+
+.main-content {
+    flex: 1;
+    min-width: 0;
+    padding: 35px;
+}
+
+.topbar {
+    margin-bottom: 35px;
+}
+
+.school-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: var(--muted);
+}
+
+.topbar h1 {
+    margin-top: 12px;
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--navy);
+}
+
+.welcome-message {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 30px;
+    max-width: 650px;
+}
+
+.welcome-message h2 {
+    font-size: 21px;
+    color: var(--navy);
+    margin-bottom: 10px;
+}
+
+.welcome-message p {
+    color: var(--muted);
+    font-size: 14px;
+}
+
+/* RESPONSIVIDADE */
+
+@media (max-width: 700px) {
+    .app-container {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        width: 100%;
+        min-height: auto;
+        padding: 15px;
+    }
+
+    .brand {
+        margin-bottom: 20px;
+    }
+
+    .menu {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .menu-item {
+        width: auto;
+        flex: 1 1 135px;
+    }
+
+    .sidebar-footer {
+        display: none;
+    }
+
+    .main-content {
+        padding: 22px 16px;
+    }
+
+    .topbar h1 {
+        font-size: 25px;
+    }
+}
+
+/* LOGIN */
+[hidden] {
+    display: none !important;
+}
+
+.login-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: #f4f5f7;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 40px;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.login-card .brand {
+    margin-bottom: 32px;
+}
+
+.login-card h1 {
+    margin-bottom: 8px;
+}
+
+.login-card > p {
+    margin-bottom: 28px;
+    color: #777777;
+}
+
+.login-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.login-card input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d5d8df;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.login-card button {
+    margin-top: 12px;
+    padding: 13px;
+    border: none;
+    border-radius: 6px;
+    background: #172b4d;
+    color: #ffffff;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.login-card button:hover {
+    opacity: 0.9;
+}
+
+#mensagem-login {
+    color: #c0392b;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+#btn-logout {
+    display: block;
+    margin-top: 12px;
+    padding: 8px 12px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 5px;
+    background: transparent;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+#btn-logout:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+@media (max-width: 480px) {
+    .login-card {
+        padding: 28px 22px;
+    }
+}
+
+/* FORMULÁRIOS DO SISTEMA */
+
+.welcome-message form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.welcome-message form label {
+    color: var(--navy);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.welcome-message form input,
+.welcome-message form select,
+.welcome-message form textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    background: var(--white);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.welcome-message form input:focus,
+.welcome-message form select:focus,
+.welcome-message form textarea:focus {
+    border-color: var(--yellow);
+    box-shadow: 0 0 0 3px rgba(248, 184, 46, 0.15);
+}
+
+.welcome-message form button {
+    width: fit-content;
+    padding: 12px 20px;
+    margin-top: 8px;
+    border: none;
+    border-radius: 7px;
+    background: var(--navy);
+    color: var(--white);
+    font-size: 13px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.welcome-message form button:hover {
+    background: #263E55;
+}
+
+/* MENSAGENS DOS FORMULÁRIOS */
+
+#mensagem {
+    margin-top: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* TABELA DE ALUNOS */
+
+#lista-alunos {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+#lista-alunos table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+#lista-alunos th {
+    padding: 13px;
+    background: var(--navy);
+    color: var(--white);
+    text-align: left;
+}
+
+#lista-alunos td {
+    padding: 13px;
+    border-bottom: 1px solid var(--border);
+}
+
+#lista-alunos tr:hover {
+    background: var(--paper);
+}
+
+/* ESPAÇAMENTO ENTRE OS PAINÉIS */
+
+.main-content #page-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+@media (max-width: 600px) {
+    .welcome-message {
+        padding: 20px;
+    }
+
+    .welcome-message form button {
+        width: 100%;
+    }
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+th,
+td {
+    padding: 12px 16px;
+    text-align: left;
+    vertical-align: middle;
+}
+
+th {
+    white-space: nowrap;
+}
+
+td {
+    border-top: 1px solid #e5e5e5;
+}
+
+td:last-child {
+    min-width: 250px;
+}
+/* Botões de ações dos alunos */
+.btn-editar,
+.btn-excluir {
+    padding: 9px 16px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+    margin-right: 8px;
+    color: white;
+}
+
+.btn-editar {
+    background-color: #245b91;
+}
+
+.btn-editar:hover {
+    background-color: #17436f;
+}
+
+.btn-excluir {
+    background-color: #c0392b;
+}
+
+.btn-excluir:hover {
+    background-color: #922b21;
+}
+/* Melhorias na tabela de ocorrências */
+#lista-ocorrencias table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+#lista-ocorrencias th:nth-child(1),
+#lista-ocorrencias td:nth-child(1) {
+    width: 32%;
+}
+
+#lista-ocorrencias th:nth-child(2),
+#lista-ocorrencias td:nth-child(2) {
+    width: 22%;
+    white-space: nowrap;
+}
+
+#lista-ocorrencias th:nth-child(3),
+#lista-ocorrencias td:nth-child(3) {
+    width: 46%;
+    overflow-wrap: break-word;
+}
+/* Indicadores de situação da frequência */
+.status-presente,
+.status-ausente {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status-presente {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.status-ausente {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+/* Indicadores visuais das notas */
+.nota-alta,
+.nota-media,
+.nota-baixa {
+    display: inline-block;
+    min-width: 42px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.nota-alta {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.nota-media {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.nota-baixa {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+
+/* Ajuste da tabela de ocorrências */
+#lista-ocorrencias td:last-child {
+    min-width: 0;
+    width: 16%;
+    white-space: nowrap;
+}
+
+#lista-ocorrencias th:nth-child(1),
+#lista-ocorrencias td:nth-child(1) {
+    width: 26%;
+}
+
+#lista-ocorrencias th:nth-child(2),
+#lista-ocorrencias td:nth-child(2) {
+    width: 20%;
+}
+
+#lista-ocorrencias th:nth-child(3),
+#lista-ocorrencias td:nth-child(3) {
+    width: 38%;
+}
