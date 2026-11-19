@@ -383,6 +383,7 @@ function exibirFrequencias(frequencias, alunos) {
                 <th>Aluno</th>
                 <th>Data</th>
                 <th>Situação</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -397,34 +398,69 @@ function exibirFrequencias(frequencias, alunos) {
 
         const linha = document.createElement("tr");
 
-       const valores = [
-    aluno ? aluno.nome : `Aluno ${registro.aluno_id}`,
-    registro.data
-];
+        const valores = [
+            aluno ? aluno.nome : `Aluno ${registro.aluno_id}`,
+            registro.data
+        ];
 
-valores.forEach(valor => {
-    const celula = document.createElement("td");
-    celula.textContent = valor;
-    linha.appendChild(celula);
-});
+        valores.forEach(valor => {
+            const celula = document.createElement("td");
+            celula.textContent = valor;
+            linha.appendChild(celula);
+        });
 
-// Destaca a situação da frequência
-const celulaSituacao = document.createElement("td");
-const situacao = document.createElement("span");
+        const celulaSituacao = document.createElement("td");
+        const situacao = document.createElement("span");
 
-situacao.textContent = registro.presente ? "Presente" : "Ausente";
-situacao.className = registro.presente
-    ? "status-presente"
-    : "status-ausente";
+        situacao.textContent = registro.presente ? "Presente" : "Ausente";
+        situacao.className = registro.presente
+            ? "status-presente"
+            : "status-ausente";
 
-celulaSituacao.appendChild(situacao);
-linha.appendChild(celulaSituacao);
+        celulaSituacao.appendChild(situacao);
+        linha.appendChild(celulaSituacao);
+
+        const celulaAcoes = document.createElement("td");
+        const botaoExcluir = document.createElement("button");
+
+        botaoExcluir.textContent = "Excluir";
+        botaoExcluir.className = "btn-excluir";
+        botaoExcluir.type = "button";
+
+        botaoExcluir.addEventListener("click", () => {
+            excluirFrequencia(registro.id);
+        });
+
+        celulaAcoes.appendChild(botaoExcluir);
+        linha.appendChild(celulaAcoes);
 
         corpo.appendChild(linha);
     });
 
     lista.replaceChildren(tabela);
 }
+
+async function excluirFrequencia(id) {
+    const confirmar = confirm(
+        "Tem certeza de que deseja excluir este registro de frequência?"
+    );
+
+    if (!confirmar) return;
+
+    try {
+        await apiRequest(`/frequencias/${id}`, {
+            method: "DELETE"
+        });
+
+        alert("Registro de frequência excluído com sucesso!");
+        carregarPaginaFrequencia();
+
+    } catch (error) {
+        alert(error.message || "Não foi possível excluir a frequência.");
+    }
+}
+
+
 
 function configurarFormularioFrequencia() {
     const formulario = document.getElementById("form-frequencia");
@@ -464,8 +500,8 @@ function configurarFormularioFrequencia() {
         }
     });
 }
-
 async function carregarPaginaNotas() {
+
     pageContent.innerHTML = `
         <div class="welcome-message">
             <h2>Carregando informações...</h2>
@@ -552,6 +588,7 @@ function exibirNotas(notas, alunos) {
                 <th>Aluno</th>
                 <th>Disciplina</th>
                 <th>Nota</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -566,39 +603,75 @@ function exibirNotas(notas, alunos) {
 
         const linha = document.createElement("tr");
 
-     const valores = [
-    aluno ? aluno.nome : `Aluno ${registro.aluno_id}`,
-    registro.disciplina
-];
+        const valores = [
+            aluno ? aluno.nome : `Aluno ${registro.aluno_id}`,
+            registro.disciplina
+        ];
 
-valores.forEach(valor => {
-    const celula = document.createElement("td");
-    celula.textContent = valor;
-    linha.appendChild(celula);
-});
+        valores.forEach(valor => {
+            const celula = document.createElement("td");
+            celula.textContent = valor;
+            linha.appendChild(celula);
+        });
 
-// Indicador visual da nota
-const celulaNota = document.createElement("td");
-const indicador = document.createElement("span");
-const nota = Number(registro.nota);
+        // Indicador visual da nota
+        const celulaNota = document.createElement("td");
+        const indicador = document.createElement("span");
+        const nota = Number(registro.nota);
 
-indicador.textContent = nota.toFixed(1);
+        indicador.textContent = nota.toFixed(1);
 
-if (nota >= 7) {
-    indicador.className = "nota-alta";
-} else if (nota >= 5) {
-    indicador.className = "nota-media";
-} else {
-    indicador.className = "nota-baixa";
-}
+        if (nota >= 7) {
+            indicador.className = "nota-alta";
+        } else if (nota >= 5) {
+            indicador.className = "nota-media";
+        } else {
+            indicador.className = "nota-baixa";
+        }
 
-celulaNota.appendChild(indicador);
-linha.appendChild(celulaNota);
+        celulaNota.appendChild(indicador);
+        linha.appendChild(celulaNota);
+
+        // Botão de exclusão
+        const celulaAcoes = document.createElement("td");
+        const botaoExcluir = document.createElement("button");
+
+        botaoExcluir.textContent = "Excluir";
+        botaoExcluir.className = "btn-excluir";
+        botaoExcluir.type = "button";
+
+        botaoExcluir.addEventListener("click", () => {
+            excluirNota(registro.id);
+        });
+
+        celulaAcoes.appendChild(botaoExcluir);
+        linha.appendChild(celulaAcoes);
 
         corpo.appendChild(linha);
     });
 
     lista.replaceChildren(tabela);
+}
+
+
+async function excluirNota(id) {
+    const confirmar = confirm(
+        "Tem certeza de que deseja excluir esta nota?"
+    );
+
+    if (!confirmar) return;
+
+    try {
+        await apiRequest(`/notas/${id}`, {
+            method: "DELETE"
+        });
+
+        alert("Nota excluída com sucesso!");
+        carregarPaginaNotas();
+
+    } catch (error) {
+        alert(error.message || "Não foi possível excluir a nota.");
+    }
 }
 
 function configurarFormularioNota() {
@@ -736,6 +809,7 @@ function exibirOcorrencias(ocorrencias, alunos) {
                 <th>Aluno</th>
                 <th>Data</th>
                 <th>Descrição</th>
+                <th>Ações</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -762,10 +836,41 @@ function exibirOcorrencias(ocorrencias, alunos) {
             linha.appendChild(celula);
         });
 
+        const celulaAcoes = document.createElement("td");
+        const botaoExcluir = document.createElement("button");
+
+        botaoExcluir.textContent = "Excluir";
+        botaoExcluir.classList.add("btn-excluir");
+        botaoExcluir.addEventListener("click", () => {
+            excluirOcorrencia(registro.id);
+        });
+
+        celulaAcoes.appendChild(botaoExcluir);
+        linha.appendChild(celulaAcoes);
+
         corpo.appendChild(linha);
     });
 
     lista.replaceChildren(tabela);
+}
+
+async function excluirOcorrencia(id) {
+    const confirmar = confirm("Deseja realmente excluir esta ocorrência?");
+
+    if (!confirmar) {
+        return;
+    }
+
+    try {
+        await apiRequest(`/ocorrencias/${id}`, {
+            method: "DELETE"
+        });
+
+        alert("Ocorrência excluída com sucesso!");
+        carregarPaginaOcorrencias();
+    } catch (erro) {
+        alert(erro.message || "Erro ao excluir ocorrência.");
+    }
 }
 
 function configurarFormularioOcorrencia() {

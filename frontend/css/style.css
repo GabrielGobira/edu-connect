@@ -553,3 +553,26 @@ td:last-child {
     background-color: #fee2e2;
     color: #991b1b;
 }
+
+
+/* Ajuste da tabela de ocorrências */
+#lista-ocorrencias td:last-child {
+    min-width: 0;
+    width: 16%;
+    white-space: nowrap;
+}
+
+#lista-ocorrencias th:nth-child(1),
+#lista-ocorrencias td:nth-child(1) {
+    width: 26%;
+}
+
+#lista-ocorrencias th:nth-child(2),
+#lista-ocorrencias td:nth-child(2) {
+    width: 20%;
+}
+
+#lista-ocorrencias th:nth-child(3),
+#lista-ocorrencias td:nth-child(3) {
+    width: 38%;
+}
