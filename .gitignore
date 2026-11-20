@@ -242,3 +242,5 @@ htmlcov/
 __pycache__/
 # Script local de redefinição de senha
 /scripts/redefinir_senha_admin.py
+# Variáveis de ambiente e chaves secretas
+.env

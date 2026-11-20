@@ -4,6 +4,9 @@ from datetime import datetime, timedelta, timezone
 import jwt
 from pwdlib import PasswordHash
 
+from dotenv import load_dotenv
+load_dotenv()
+
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
@@ -48,3 +51,4 @@ def decodificar_token(token: str) -> dict:
         algorithms=[ALGORITHM],
         options={"require": ["sub", "exp"]},
     )
+
