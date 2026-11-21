@@ -196,5 +196,5 @@ Sugestão de padrão de commits: [Conventional Commits](https://www.conventional
 
 Distribuído sob a licença **MIT**. Consulte o arquivo [LICENSE](LICENSE) para mais informações.
 
----
+--
 
