@@ -576,3 +576,34 @@ td:last-child {
 #lista-ocorrencias td:nth-child(3) {
     width: 38%;
 }
+/* LOGOMARCA EDUCONNECT */
+
+.brand img {
+    width: 210px;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+
+.sidebar .brand img {
+    width: 155px;
+}
+
+.login-card .brand {
+    justify-content: center;
+    margin-bottom: 30px;
+}
+/* FUNDO DA LOGOMARCA NO MENU LATERAL */
+
+.sidebar .brand {
+    background: #FFFFFF;
+    border-radius: 10px;
+    padding: 10px;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.sidebar .brand img {
+    width: 155px;
+    display: block;
+}
