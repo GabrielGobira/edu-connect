@@ -553,3 +553,26 @@ def test_criar_banco_cria_tabelas_e_exibe_mensagem(
         saida.out.strip()
         == "Banco de dados e tabelas criados com sucesso!"
     )
+def test_impedir_usuario_com_tipo_invalido():
+    engine = criar_engine_teste()
+    Base.metadata.create_all(bind=engine)
+
+    try:
+        with Session(engine) as session:
+            usuario = Usuario(
+                nome="Usuario Teste",
+                email="invalido@teste.com",
+                senha="senha_teste",
+                tipo="invalido"
+            )
+
+            session.add(usuario)
+
+            with pytest.raises(
+                IntegrityError, match="ck_usuario_tipo"
+            ):
+                session.commit()
+
+            session.rollback()
+    finally:
+        engine.dispose()
